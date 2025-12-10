@@ -26,8 +26,8 @@ jobs:
       - name: Build manifests (dev overlay)
         run: kustomize build k8s/overlays/dev > /tmp/manifests.yaml
 
-      - name: Validate manifest syntax
-        run: kubectl apply --dry-run=client --validate=false -f /tmp/manifests.yaml
+      - name: Validate manifests (client-side only)
+        run: kubectl create --dry-run=client --validate=false -f /tmp/manifests.yaml
 
       - name: YAML Lint
         uses: ibiqlik/action-yamllint@v3
