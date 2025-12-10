@@ -1,215 +1,101 @@
-# Onboarding Guide
+# Operational Overview
 
-Welcome to **k8s-production-blueprint** — a production-ready Kubernetes learning and deployment scaffold.
+This document provides the operational details required to work with the manifests and environment structure used in this repository.
 
-This guide walks you through:
-- how the repo is structured  
-- how to use it for local development  
-- how to apply manifests safely  
-- how to incrementally learn production Kubernetes concepts  
-- how to contribute using a step-by-step workflow  
+## Prerequisites
 
----
-
-# 1. Prerequisites
-
-Install the following tools:
-
-## Kubernetes CLI
+Install:
 ```bash
 brew install kubectl
-```
-
-## Kustomize
-```bash
 brew install kustomize
-```
-
-## kind (Kubernetes in Docker)
-```bash
 brew install kind
 ```
 
-## Optional but recommended
-- **k9s** for cluster navigation  
-- **stern** for log tailing  
-- **kubectx + kubens** for context switching  
+Optional utilities:
+- k9s
+- stern
+- kubectx / kubens
 
----
+## Local Environment Setup
 
-# 2. Repo Overview
-
-```
-k8s/
-  base/           # Core manifests
-  overlays/dev/   # Development environment
-  overlays/prod/  # Production environment
-  apps/           # Application deployments
-
-.github/workflows # CI validation
-tools/            # Scripts (kind setup, helpers)
-docs/             # Documentation, guides, patterns
-```
-
-This structure mirrors real production repo layouts used by DevOps and platform engineering teams.
-
----
-
-# 3. Spin up a Local Kubernetes Cluster (kind)
-
-Run:
+### Create a local cluster
 ```bash
 ./tools/create-kind-cluster.sh
 ```
 
-Verify:
+### Check cluster status
 ```bash
 kubectl get nodes
 ```
 
----
+## Deployment Workflow
 
-# 4. Deploy to the Dev Environment
-
-Use Kustomize overlays to build and apply manifests:
-
+### Dev environment
 ```bash
 kustomize build k8s/overlays/dev | kubectl apply -f -
 ```
 
-Check the resources:
+### Production environment
 ```bash
-kubectl get all -n myapp-dev
+kustomize build k8s/overlays/prod | kubectl apply -f -
 ```
 
-To delete:
+### Remove resources
 ```bash
 kustomize build k8s/overlays/dev | kubectl delete -f -
 ```
 
----
+## Manifest Dependency Order
 
-# 5. Understanding the Manifest Order
+1. Namespace
+2. Secrets (externalized)
+3. ConfigMaps
+4. ServiceAccount & RBAC
+5. PVC / Storage
+6. Services
+7. Deployments / StatefulSets
+8. Ingress / TLS
+9. Autoscaling
 
-This repo follows the correct dependency workflow:
+## Secret Management
 
-1. Namespace  
-2. Secrets  
-3. ConfigMaps  
-4. ServiceAccount / RBAC  
-5. PVC  
-6. Service  
-7. Deployment / StatefulSet  
-8. Ingress  
-9. Autoscaling (HPA)  
+Secrets are externalized and never committed.
 
-This order is the backbone of production Kubernetes deployments.
-
----
-
-# 6. Working with Secrets (Important)
-
-Never commit plaintext secrets.
-
-We use:
-- file templates (`secret.template.yaml`)
-- secrets provided via CLI at deployment time
-- support for sealed-secrets or sops added later
-
-To create a secret locally:
+Create secrets locally:
 ```bash
-kubectl create secret generic myapp-secret   --from-literal=DATABASE_URL="postgres://user:pass@db:5432/mydb"   -n myapp-dev
+kubectl create secret generic myapp-secret   --from-literal=DATABASE_URL="postgres://..."   -n myapp-dev
 ```
 
----
+## CI Integration
 
-# 7. CI Validation Workflow
+The GitHub Actions workflow validates:
+- Kustomize builds
+- Kubernetes dry-run apply
 
-Every PR triggers:
-- Kustomize build  
-- Kubernetes dry-run apply  
-- YAML validation  
+Ensures all changes remain deployable and consistent.
 
-This ensures:
-- No broken manifests get merged  
-- Everything is always deployable  
+## Contribution Workflow
 
-CI config lives here:
-```
-.github/workflows/validate-manifests.yaml
-```
-
----
-
-# 8. Roadmap for Learning (Commit by Commit)
-
-Each future commit introduces a production concept:
-
-- RBAC & ServiceAccounts  
-- NetworkPolicies  
-- Liveness & Readiness probes  
-- Resource requests/limits  
-- PodDisruptionBudget  
-- Ingress + TLS (cert-manager)  
-- Autoscaling (HPA)  
-- GitOps (Flux or ArgoCD)  
-- Observability stack  
-- Logging stack  
-- Policy-as-code (Gatekeeper/Conftest)
-
-Treat each commit as a learning checkpoint.
-
----
-
-# 9. Contribution Workflow
-
-1. Create a feature branch  
-2. Add or modify manifests  
-3. Run validation locally:  
+1. Create a feature branch
+2. Modify or add manifests
+3. Validate:
 ```bash
 kustomize build k8s/overlays/dev | kubectl apply --dry-run=client -f -
 ```
-4. Commit changes  
-5. Open a PR  
-6. Ensure CI passes  
+4. Commit + PR
+5. Ensure CI passes
 
----
+## Troubleshooting
 
-# 10. Troubleshooting
-
-### Pod not starting?
-Check logs:
+### Pod startup issues
 ```bash
 kubectl logs deployment/myapp -n myapp-dev
 ```
 
-### Image pull errors?
-Use:
+### YAML issues
 ```bash
-kubectl describe pod <pod-name>
+kubectl apply --dry-run=client -f <file>
 ```
 
-### YAML issues?
-Use:
-```bash
-kubectl apply --dry-run=client -f <file.yaml>
-```
-
-### Kustomize build failing?
-Ensure files are referenced in `kustomization.yaml`.
-
----
-
-# 11. Next Steps
-
-Explore:
-- modifying Deployment replicas
-- adding resource limits
-- adding probes
-- creating additional apps under `apps/`
-- deploying to prod overlay
-
----
-
-Happy building 🚀  
-This repo is intentionally crafted to teach you real-world Kubernetes patterns.  
+### Kustomize errors
+Ensure correct references inside `kustomization.yaml`.

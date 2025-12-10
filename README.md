@@ -1,144 +1,80 @@
-# k8s-production-blueprint  
-**Production-ready Kubernetes blueprint with Kustomize overlays, secure defaults, CI validation, and GitOps-friendly manifests.**
+# k8s-production-blueprint
+Production-ready Kubernetes blueprint with Kustomize overlays, secure defaults, CI validation, and GitOps-compatible manifests.
 
-This repository is a **clean, extensible, production-focused Kubernetes starter kit** designed to help you:
-- learn Kubernetes the right way (layered, secure, declarative)
-- deploy real-world applications with confidence
-- adopt best practices for scaling, networking, security, and GitOps
-- maintain a clean, future-proof directory structure instead of YAML sprawl
+This repository provides a clean, extensible foundation for deploying applications to Kubernetes using industry-standard patterns. The layout is optimized for clarity, security, reusability, and operational consistency across environments.
 
-Whether you're building your first production cluster or refining your DevOps workflow, this blueprint gives you a solid foundation.
+## Features
 
----
+### • Environment-based Kustomize structure
+- Shared `base` layer for core Kubernetes objects
+- `overlays/dev` and `overlays/prod` for environment-specific configuration
+- Zero duplication and clean patching model
 
-## ✨ Features
+### • Secure-by-default configuration
+- Namespaces, ServiceAccounts, and RBAC
+- NetworkPolicies support (optional)
+- Externalized secrets (no plaintext secrets committed)
+- Resource boundaries, probes, and scalable deployment patterns
 
-### ✔ **Production-ready Kustomize structure**
-- Separation of `base` and environment-specific overlays (`dev`, `prod`)
-- Zero duplication, clean layering, easy to extend
-- Clear dependency ordering (Namespace → Config → RBAC → Service → Deployment → Ingress → HPA)
+### • CI validation
+GitHub Actions workflow validates:
+- Kustomize builds
+- Kubernetes manifest syntax
+- Dry-run apply checks
 
-### ✔ **Secure-by-default manifests**
-- Namespaces for isolation  
-- ServiceAccounts and RBAC roles  
-- NetworkPolicies (optional)  
-- No plaintext secrets committed  
-
-### ✔ **GitHub Actions CI**
-- Validates Kubernetes manifests
-- Runs `kustomize build` on each PR
-- Dry-run apply to catch errors before deployment
-- Ready for expansion into full CI/CD pipelines
-
-### ✔ **GitOps-friendly**
-All manifests are declarative and structured for easy adoption with:
+### • GitOps-ready
+Manifests integrate seamlessly with:
 - FluxCD
 - ArgoCD
-- Rancher Fleet
+- Any declarative GitOps controller
 
-### ✔ **Local development with kind**
-Includes scripts to spin up a reproducible local cluster on your laptop.
+### • Local cluster support (kind)
+Provision deterministic local clusters for safe testing.
 
----
-
-## 📂 Directory Structure
+## Directory Structure
 
 ```
 k8s-production-blueprint/
 ├─ k8s/
-│  ├─ base/                # Core manifests shared across all environments
+│  ├─ base/
 │  ├─ overlays/
-│  │  ├─ dev/              # Development configuration
-│  │  └─ prod/             # Production configuration
+│  │  ├─ dev/
+│  │  └─ prod/
 │  └─ apps/
-│     └─ myapp/            # Example application (Deployment, Service, HPA, PVC)
-├─ .github/
-│  └─ workflows/           # CI validation workflows
-├─ tools/                  # Helper scripts (e.g., create-kind-cluster)
-├─ docs/                   # Learning notes, guides, architecture diagrams
+│     └─ myapp/
+├─ .github/workflows/
+├─ tools/
+├─ docs/
 └─ README.md
 ```
 
----
+## Quick Start
 
-## 🚀 Getting Started
-
-### 1️⃣ Clone the repository
-```bash
-git clone https://github.com/<your-username>/k8s-production-blueprint.git
-cd k8s-production-blueprint
-```
-
-### 2️⃣ Create a local Kubernetes cluster using kind
+### Create a local Kubernetes cluster
 ```bash
 ./tools/create-kind-cluster.sh
 ```
 
-### 3️⃣ Deploy the sample app to the dev environment
+### Apply dev environment manifests
 ```bash
 kustomize build k8s/overlays/dev | kubectl apply -f -
 ```
 
-### 4️⃣ Verify
+### Verify
 ```bash
-kubectl get pods -n myapp-dev
-kubectl get svc -n myapp-dev
+kubectl get all -n myapp-dev
 ```
 
----
+## Roadmap
 
-## 🧠 What You'll Learn (by following the commits)
+- Add RBAC refinements
+- Add NetworkPolicies
+- Add probes across deployments
+- Add PodDisruptionBudgets
+- Add Ingress + TLS (cert-manager)
+- Add GitOps bootstrap configuration
+- Add monitoring and logging components
+- Add security scanning workflows
 
-This project is intentionally built to teach you **how production Kubernetes is done**:
-
-- structuring manifests the right way  
-- layering environments with Kustomize  
-- RBAC, security, and least-privilege access  
-- managing secrets securely  
-- health probes, resource limits, autoscaling  
-- ingress & TLS  
-- CI validation  
-- GitOps workflows  
-- scaling and operational best practices  
-
-Every pull request adds a new production concept in a clean, incremental way.
-
----
-
-## 📌 Roadmap
-
-- [ ] Add full ConfigMap + Secret workflow (sealed secrets or sops)
-- [ ] Add RBAC roles + bindings
-- [ ] Add NetworkPolicies
-- [ ] Add liveness/readiness probes
-- [ ] Add PodDisruptionBudget
-- [ ] Add ingress + TLS (cert-manager)
-- [ ] Add GitOps bootstrap (Flux or ArgoCD)
-- [ ] Add monitoring stack (Prometheus + Grafana)
-- [ ] Add logging stack (Loki or EFK)
-- [ ] Add image scanning (Trivy) in CI
-- [ ] Add policy-as-code checks (Conftest / Gatekeeper)
-
-Open to contributions as the blueprint evolves.
-
----
-
-## 📄 License
-This project is licensed under the **MIT License**.  
-See `LICENSE` for details.
-
----
-
-## ⭐ Support & Contributions
-
-If this project helps you:
-
-🌟 **Star the repo** — it motivates further development  
-📥 **Open issues** for improvements  
-🔀 **Submit PRs** — contributions are welcome  
-
----
-
-## 🙌 Acknowledgements
-
-Inspired by real-world production Kubernetes patterns used across modern DevOps teams, GitOps platforms, and cloud-native infrastructure.
+## License
+MIT License. See `LICENSE` for details.
