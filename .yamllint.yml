@@ -1,0 +1,22 @@
+extends: default
+
+rules:
+  # Allow no document start on k8s yamls
+  document-start: disable
+
+  # Allow long lines up to 160 chars (Kubernetes annotations get long)
+  line-length:
+    max: 160
+    level: warning
+
+  # Allow missing end-of-file newline (optional)
+  new-line-at-end-of-file: disable
+
+  # Optional: ignore vendor or generated dirs
+  truthy: disable
+  comments:
+    min-spaces-from-content: 1
+
+ignore: |
+  **/README.md
+  **/*.json
