@@ -1,0 +1,6 @@
+---
+# SOPS configuration - placeholder KMS ARN. Replace with your real KMS key ARN(s).
+creation_rules:
+  - kms: arn:aws:kms:ap-south-1:123456789012:key/REPLACE-ME-WITH-YOUR-ACTUAL-KMS-KEY-ID
+    encrypted_regex: ^(data|stringData)$
+    path_regex: ^k8s/secrets/.*\.enc\.yaml$
