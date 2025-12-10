@@ -4,8 +4,12 @@ kind: Kustomization
 namespace: myapp-prod
 
 resources:
+  - namespace.yaml
   - ../../base
-  - ../../apps/myapp
+  - ../../optional/ingress           # only if enabled
+  # - ../../optional/loadbalancer
+  # - ../../optional/networkpolicy
+  # - ../../optional/monitoring
 
 patchesStrategicMerge:
   - patch-deployment.yaml
