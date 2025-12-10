@@ -1,0 +1,79 @@
+{
+  "dashboard": {
+    "id": null,
+    "uid": "myapp-advanced",
+    "title": "myapp - Advanced (Resource & HPA)",
+    "panels": [
+      {
+        "type": "graph",
+        "title": "Request Rate (inferred via kube metrics if app metrics missing)",
+        "targets": [
+          {
+            "expr": "sum by (pod) (rate(container_cpu_usage_seconds_total{namespace=\"myapp-dev\",pod=~\"myapp.*\"}[1m]))",
+            "legendFormat": "{{pod}}"
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 0
+        }
+      },
+      {
+        "type": "graph",
+        "title": "CPU Utilization (%)",
+        "targets": [
+          {
+            "expr": "sum by (pod) (rate(container_cpu_usage_seconds_total{namespace=\"myapp-dev\",pod=~\"myapp.*\"}[5m])) / sum by (pod) (kube_pod_container_resource_limits_cpu_cores{namespace=\"myapp-dev\",pod=~\"myapp.*\"}) * 100",
+            "legendFormat": "{{pod}}"
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 12,
+          "y": 0
+        }
+      },
+      {
+        "type": "graph",
+        "title": "Memory Working Set (MiB)",
+        "targets": [
+          {
+            "expr": "sum by (pod) (container_memory_working_set_bytes{namespace=\"myapp-dev\",pod=~\"myapp.*\"}) / 1024 / 1024",
+            "legendFormat": "{{pod}}"
+          }
+        ],
+        "gridPos": {
+          "h": 6,
+          "w": 12,
+          "x": 0,
+          "y": 8
+        }
+      },
+      {
+        "type": "graph",
+        "title": "HPA Desired vs Current",
+        "targets": [
+          {
+            "expr": "kube_hpa_status_desired_replicas{namespace=\"myapp-dev\",hpa=\"myapp-hpa\"}",
+            "legendFormat": "desired"
+          },
+          {
+            "expr": "kube_hpa_status_current_replicas{namespace=\"myapp-dev\",hpa=\"myapp-hpa\"}",
+            "legendFormat": "current"
+          }
+        ],
+        "gridPos": {
+          "h": 6,
+          "w": 12,
+          "x": 12,
+          "y": 8
+        }
+      }
+    ],
+    "schemaVersion": 27,
+    "version": 1
+  }
+}

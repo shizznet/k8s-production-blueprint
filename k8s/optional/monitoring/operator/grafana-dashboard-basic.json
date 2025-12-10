@@ -1,0 +1,75 @@
+{
+  "dashboard": {
+    "id": null,
+    "uid": "myapp-basic",
+    "title": "myapp - Basic",
+    "panels": [
+      {
+        "type": "graph",
+        "title": "CPU Usage (per pod)",
+        "targets": [
+          {
+            "expr": "sum by (pod) (rate(container_cpu_usage_seconds_total{namespace=\"myapp-dev\",pod=~\"myapp.*\"}[5m]))",
+            "legendFormat": "{{pod}}"
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 0
+        }
+      },
+      {
+        "type": "graph",
+        "title": "Memory Usage (per pod)",
+        "targets": [
+          {
+            "expr": "sum by (pod) (container_memory_usage_bytes{namespace=\"myapp-dev\",pod=~\"myapp.*\"})",
+            "legendFormat": "{{pod}}"
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 12,
+          "y": 0
+        }
+      },
+      {
+        "type": "graph",
+        "title": "Pod Restarts",
+        "targets": [
+          {
+            "expr": "increase(kube_pod_container_status_restarts_total{namespace=\"myapp-dev\",pod=~\"myapp.*\"}[1h])",
+            "legendFormat": "{{pod}}"
+          }
+        ],
+        "gridPos": {
+          "h": 6,
+          "w": 12,
+          "x": 0,
+          "y": 8
+        }
+      },
+      {
+        "type": "graph",
+        "title": "Replica Count",
+        "targets": [
+          {
+            "expr": "kube_deployment_status_replicas_available{namespace=\"myapp-dev\",deployment=\"myapp\"}",
+            "legendFormat": "available"
+          }
+        ],
+        "gridPos": {
+          "h": 6,
+          "w": 12,
+          "x": 12,
+          "y": 8
+        }
+      }
+    ],
+    "schemaVersion": 27,
+    "version": 1
+  }
+}

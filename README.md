@@ -1,80 +1,145 @@
-# k8s-production-blueprint
-Production-ready Kubernetes blueprint with Kustomize overlays, secure defaults, CI validation, and GitOps-compatible manifests.
+# k8s-production-blueprint  
+Production-ready Kubernetes blueprint with Kustomize overlays, secure defaults, CI validation, optional security modules, and GitOps-compatible manifests.
 
-This repository provides a clean, extensible foundation for deploying applications to Kubernetes using industry-standard patterns. The layout is optimized for clarity, security, reusability, and operational consistency across environments.
+This repository provides an extensible structure for deploying applications to Kubernetes following production best practices.  
+Optional modules (network policies, ingress/TLS, monitoring) are included for environments that require additional capabilities.
+
+---
 
 ## Features
 
 ### • Environment-based Kustomize structure
-- Shared `base` layer for core Kubernetes objects
-- `overlays/dev` and `overlays/prod` for environment-specific configuration
-- Zero duplication and clean patching model
+- Shared `base` layer for core Kubernetes objects  
+- Isolated dev/prod overlays  
+- Clear, minimal patching model  
 
 ### • Secure-by-default configuration
-- Namespaces, ServiceAccounts, and RBAC
-- NetworkPolicies support (optional)
-- Externalized secrets (no plaintext secrets committed)
-- Resource boundaries, probes, and scalable deployment patterns
+- Dedicated namespaces  
+- Explicit ServiceAccount identity  
+- Resource requests, limits, probes  
+- Optional zero-trust NetworkPolicies  
+
+### • Optional ingress & TLS
+Located under `k8s/optional/ingress/`:
+- NGINX Ingress  
+- cert-manager ClusterIssuers  
+- TLS Certificate template  
+
+### • Optional monitoring module (Operator or Annotation-based)
+Located under `k8s/optional/monitoring/`:
+
+#### **Operator mode**
+```
+k8s/optional/monitoring/operator/
+```
+Includes:
+- `grafana-dashboard-basic.json`  
+- `grafana-dashboard-advanced.json`  
+- Compatible with Prometheus Operator  
+- Uses cluster-level metrics
+
+#### **Annotation mode**
+```
+k8s/optional/monitoring/annotations/
+```
+Includes:
+- Patch for Prometheus scrape annotations  
+- Basic & advanced dashboards  
+- Works with plain Prometheus setups  
+
+Enable by adding to overlay:
+```yaml
+resources:
+  - ../../optional/monitoring/operator
+```
+or
+```yaml
+resources:
+  - ../../optional/monitoring/annotations
+```
 
 ### • CI validation
-GitHub Actions workflow validates:
-- Kustomize builds
-- Kubernetes manifest syntax
-- Dry-run apply checks
+CI checks:
+- Kustomize build  
+- Kubernetes manifest validation  
+- YAML linting  
 
 ### • GitOps-ready
-Manifests integrate seamlessly with:
-- FluxCD
-- ArgoCD
-- Any declarative GitOps controller
+Compatible with FluxCD, ArgoCD, Rancher Fleet, and other GitOps controllers.
 
-### • Local cluster support (kind)
-Provision deterministic local clusters for safe testing.
+---
 
 ## Directory Structure
 
 ```
-k8s-production-blueprint/
-├─ k8s/
-│  ├─ base/
-│  ├─ overlays/
-│  │  ├─ dev/
-│  │  └─ prod/
-│  └─ apps/
-│     └─ myapp/
-├─ .github/workflows/
-├─ tools/
-├─ docs/
-└─ README.md
+k8s/
+  base/
+  apps/
+  overlays/
+    dev/
+    prod/
+  optional/
+    ingress/
+    networkpolicy/
+    monitoring/
+      operator/
+      annotations/
 ```
+
+---
 
 ## Quick Start
 
-### Create a local Kubernetes cluster
+Create a cluster:
 ```bash
 ./tools/create-kind-cluster.sh
 ```
 
-### Apply dev environment manifests
+Deploy to dev:
 ```bash
 kustomize build k8s/overlays/dev | kubectl apply -f -
 ```
 
-### Verify
-```bash
-kubectl get all -n myapp-dev
+---
+
+## Optional Modules Overview
+
+### 🔹 NetworkPolicies
+Enable strict traffic isolation — optional:
+```yaml
+resources:
+  - ../../optional/networkpolicy
 ```
 
-## Roadmap
+### 🔹 Ingress + cert-manager
+Enable HTTP routing + TLS — optional:
+```yaml
+resources:
+  - ../../optional/ingress
+```
 
-- Add RBAC refinements
-- Add NetworkPolicies
-- Add probes across deployments
-- Add PodDisruptionBudgets
-- Add Ingress + TLS (cert-manager)
-- Add GitOps bootstrap configuration
-- Add monitoring and logging components
-- Add security scanning workflows
+### 🔹 Monitoring (Operator or Annotation-based)
+Add dashboards + scrape integration — optional:
+```yaml
+resources:
+  - ../../optional/monitoring/operator
+```
+or
+```yaml
+resources:
+  - ../../optional/monitoring/annotations
+```
+
+---
+
+## Roadmap
+- PodSecurity / securityContext  
+- PDB definitions  
+- GitOps bootstrap configs  
+- Secret management integrations (SOPS / SealedSecrets)  
+- Extended observability modules  
+
+---
 
 ## License
-MIT License. See `LICENSE` for details.
+MIT License.  

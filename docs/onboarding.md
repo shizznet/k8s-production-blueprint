@@ -1,6 +1,8 @@
 # Operational Overview
 
-This document provides the operational details required to work with the manifests and environment structure used in this repository.
+This document provides operational guidance for deploying and managing the Kubernetes manifests in this repository.
+
+---
 
 ## Prerequisites
 
@@ -11,91 +13,132 @@ brew install kustomize
 brew install kind
 ```
 
-Optional utilities:
-- k9s
-- stern
-- kubectx / kubens
+Recommended:
+- k9s  
+- stern  
+- kubectx / kubens  
 
-## Local Environment Setup
+---
 
-### Create a local cluster
+## Local Cluster Setup
+
 ```bash
 ./tools/create-kind-cluster.sh
-```
-
-### Check cluster status
-```bash
 kubectl get nodes
 ```
 
+---
+
 ## Deployment Workflow
 
-### Dev environment
+Dev:
 ```bash
 kustomize build k8s/overlays/dev | kubectl apply -f -
 ```
 
-### Production environment
+Prod:
 ```bash
 kustomize build k8s/overlays/prod | kubectl apply -f -
 ```
 
-### Remove resources
+Remove:
 ```bash
 kustomize build k8s/overlays/dev | kubectl delete -f -
 ```
 
-## Manifest Dependency Order
+---
 
-1. Namespace
-2. Secrets (externalized)
-3. ConfigMaps
-4. ServiceAccount & RBAC
-5. PVC / Storage
-6. Services
-7. Deployments / StatefulSets
-8. Ingress / TLS
-9. Autoscaling
+## Optional Modules
+
+### 🔹 NetworkPolicies
+Located under:
+```
+k8s/optional/networkpolicy/
+```
+
+Enable:
+```yaml
+resources:
+  - ../../optional/networkpolicy
+```
+
+### 🔹 Ingress & TLS (NGINX + cert-manager)
+Located under:
+```
+k8s/optional/ingress/
+```
+
+Enable:
+```yaml
+resources:
+  - ../../optional/ingress
+```
+
+Ensure:
+- NGINX ingress controller installed  
+- cert-manager installed  
+- DNS updated  
+
+### 🔹 Monitoring (Operator or Annotation-based)
+Located under:
+```
+k8s/optional/monitoring/
+```
+
+#### Operator mode:
+For clusters with Prometheus Operator.  
+Includes:
+- basic and advanced dashboards  
+
+Enable:
+```yaml
+resources:
+  - ../../optional/monitoring/operator
+```
+
+#### Annotation mode:
+For plain Prometheus.  
+Patches deployment with scrape annotations.
+
+Enable:
+```yaml
+resources:
+  - ../../optional/monitoring/annotations
+```
+
+---
 
 ## Secret Management
 
-Secrets are externalized and never committed.
-
-Create secrets locally:
+Create secrets:
 ```bash
 kubectl create secret generic myapp-secret   --from-literal=DATABASE_URL="postgres://..."   -n myapp-dev
 ```
 
+---
+
 ## CI Integration
 
-The GitHub Actions workflow validates:
-- Kustomize builds
-- Kubernetes dry-run apply
+CI enforces:
+- Kustomize build success  
+- kubectl dry-run validation  
+- YAML linting  
 
-Ensures all changes remain deployable and consistent.
-
-## Contribution Workflow
-
-1. Create a feature branch
-2. Modify or add manifests
-3. Validate:
-```bash
-kustomize build k8s/overlays/dev | kubectl apply --dry-run=client -f -
-```
-4. Commit + PR
-5. Ensure CI passes
+---
 
 ## Troubleshooting
 
-### Pod startup issues
+Pod logs:
 ```bash
 kubectl logs deployment/myapp -n myapp-dev
 ```
 
-### YAML issues
+Validate manifest:
 ```bash
-kubectl apply --dry-run=client -f <file>
+kubectl apply --dry-run=client -f file.yaml
 ```
 
-### Kustomize errors
-Ensure correct references inside `kustomization.yaml`.
+Kustomize errors:
+Verify entries in `kustomization.yaml`.
+
+---
