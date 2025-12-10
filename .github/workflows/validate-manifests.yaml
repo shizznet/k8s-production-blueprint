@@ -38,4 +38,3 @@ jobs:
         uses: ibiqlik/action-yamllint@v3
         with:
           file_or_dir: k8s
-

@@ -1,0 +1,7 @@
+# Default owner for all files
+* @your-username
+
+# Ownership for critical areas
+/k8s/base/ @your-username
+/k8s/optional/ @your-username
+/gitops/ @your-username
