@@ -4,8 +4,7 @@ metadata:
   name: myapp
 spec:
   replicas: 4
-  template:
-    spec:
+  template:\n    spec:\n      topologySpreadConstraints:\n        - maxSkew: 1\n          topologyKey: topology.kubernetes.io/zone\n          whenUnsatisfiable: DoNotSchedule\n          labelSelector:\n            matchLabels:\n              app: myapp
       containers:
         - name: myapp
           image: ghcr.io/your-org/myapp:stable
