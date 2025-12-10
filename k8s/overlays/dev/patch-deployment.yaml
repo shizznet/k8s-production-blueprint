@@ -1,0 +1,11 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myapp
+spec:
+  replicas: 2
+  template:
+    spec:
+      containers:
+        - name: myapp
+          image: ghcr.io/your-org/myapp:dev

@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-metrics-scrape
+  namespace: myapp-dev
+spec:
+  podSelector:
+    matchLabels:
+      app: myapp
+  policyTypes:
+    - Ingress
+  ingress:
+    - description: Allow monitoring namespace to scrape metrics
+      from:
+        - namespaceSelector:
+            matchLabels:
+              purpose: monitoring
+        - podSelector:
+            matchLabels:
+              role: prometheus
+      ports:
+        - protocol: TCP
+          port: 9100
+# NOTE: This policy assumes the monitoring namespace is labeled: purpose=monitoring
+# or that Prometheus pods have label role=prometheus. Adjust selectors to match your environment.

@@ -1,0 +1,26 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-app-traffic
+  namespace: myapp-dev  # update namespace when applying to prod
+spec:
+  podSelector:
+    matchLabels:
+      app: myapp
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - description: Allow internal namespace traffic to app port
+      from:
+        - podSelector: {}
+      ports:
+        - protocol: TCP
+          port: 8080
+  egress:
+    - description: Allow app to call downstream services within the namespace
+      to:
+        - podSelector: {}
+      ports:
+        - protocol: TCP
+          port: 8080

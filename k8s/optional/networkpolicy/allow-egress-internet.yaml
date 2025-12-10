@@ -1,0 +1,17 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-egress-internet
+  namespace: myapp-dev
+spec:
+  podSelector: {}
+  policyTypes:
+    - Egress
+  egress:
+    - description: Allow HTTPS outbound to internet
+      to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - protocol: TCP
+          port: 443

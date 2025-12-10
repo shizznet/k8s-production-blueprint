@@ -1,0 +1,19 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-dns
+  namespace: myapp-dev
+spec:
+  podSelector: {}
+  policyTypes:
+    - Egress
+  egress:
+    - description: Allow DNS (UDP/TCP 53) to external resolvers or cluster DNS
+      to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53

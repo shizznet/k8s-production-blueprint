@@ -1,0 +1,12 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: myapp-cert
+  namespace: myapp-prod
+spec:
+  secretName: myapp-tls
+  dnsNames:
+    - myapp.example.com
+  issuerRef:
+    name: letsencrypt-staging
+    kind: ClusterIssuer
