@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="banner.png" alt="k8s-production-blueprint banner" width="100%" />
+</p>
+
 # k8s-production-blueprint  
 Production-ready Kubernetes blueprint with Kustomize overlays, secure defaults, CI validation, optional security modules, and GitOps-compatible manifests.
 
