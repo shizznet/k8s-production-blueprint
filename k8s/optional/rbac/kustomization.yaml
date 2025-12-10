@@ -1,0 +1,3 @@
+resources:
+  - readonly-role.yaml
+  - readonly-binding.yaml

@@ -1,7 +1,8 @@
 # Default owner for all files
-* @your-username
+* @shizznet
 
 # Ownership for critical areas
-/k8s/base/ @your-username
-/k8s/optional/ @your-username
-/gitops/ @your-username
+/k8s/* @shizznet
+/gitops/* @shizznet
+/eks/* @shizznet
+/tools/* @shizznet
