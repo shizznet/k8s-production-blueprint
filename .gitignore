@@ -1,0 +1,49 @@
+# Ignore OS files
+.DS_Store
+
+# Ignore editor settings
+.vscode/
+.idea/
+
+# Python envs (in case tools/scripts use them)
+venv/
+.env
+.envrc
+
+# Kubernetes local config
+.kube/
+
+# Secrets (never commit)
+secrets/
+*.secret
+*.enc
+*.key
+*.pem
+*.crt
+*.cert
+*.token
+
+# SOPS / SealedSecrets temp files
+*.yaml.dec
+*.json.dec
+
+# Logs
+logs/
+*.log
+
+# Build artifacts
+dist/
+build/
+
+# Generated Kustomize build output
+kustomize-build.yaml
+
+# Kind cluster artifacts
+kind-config/
+kind-cluster/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.swp
