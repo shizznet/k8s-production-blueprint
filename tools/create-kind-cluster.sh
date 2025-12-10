@@ -26,11 +26,6 @@ networking:
   kubeProxyMode: "iptables"
 EOF
 
-echo ""
-echo "Cluster '${CLUSTER_NAME}' created successfully."
-echo ""
-echo "Next step: install nginx ingress controller (required for local ingress testing):"
-echo "  kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml"
-echo ""
-echo "Check cluster info:"
-echo "  kubectl cluster-info --context kind-${CLUSTER_NAME}"
+echo "Cluster '${CLUSTER_NAME}' created."
+echo "Install ingress:"
+echo "kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml"

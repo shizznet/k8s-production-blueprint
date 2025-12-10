@@ -1,89 +1,52 @@
 <p align="center">
-  <img src="banner.png" alt="k8s-production-blueprint banner" width="100%" />
+  <img src="./banner.png" width="100%" />
 </p>
 
 # k8s-production-blueprint
-Production-ready Kubernetes blueprint with Kustomize overlays, secure defaults, CI validation, optional modules, and GitOps-compatible manifests.
+
+[![CI](https://github.com/shizznet/k8s-production-blueprint/actions/workflows/validate-manifests.yaml/badge.svg)](https://github.com/shizznet/k8s-production-blueprint/actions/workflows/validate-manifests.yaml)
+
+Production-ready Kubernetes blueprint with:
+- Kustomize overlays  
+- FluxCD GitOps  
+- SOPS + AWS KMS secret encryption  
+- Optional modules (Ingress, NLB, NetworkPolicy, Monitoring)  
+- Terraform EKS bootstrap  
 
 ---
 
-# k8s-production-blueprint
-Production-ready Kubernetes blueprint with Kustomize overlays, secure defaults, CI validation, and GitOps-compatible manifests.
+# 🚀 Quick Start (Full Production Flow)
 
-This repository provides a clean, extensible foundation for deploying applications to Kubernetes using industry-standard patterns. The layout is optimized for clarity, security, reusability, and operational consistency across environments.
-
-## Features
-
-### • Environment-based Kustomize structure
-- Shared `base` layer for core Kubernetes objects
-- `overlays/dev` and `overlays/prod` for environment-specific configuration
-- Zero duplication and clean patching model
-
-### • Secure-by-default configuration
-- Namespaces, ServiceAccounts, and RBAC
-- NetworkPolicies support (optional)
-- Externalized secrets (no plaintext secrets committed)
-- Resource boundaries, probes, and scalable deployment patterns
-
-### • CI validation
-GitHub Actions workflow validates:
-- Kustomize builds
-- Kubernetes manifest syntax
-- Dry-run apply checks
-
-### • GitOps-ready
-Manifests integrate seamlessly with:
-- FluxCD
-- ArgoCD
-- Any declarative GitOps controller
-
-### • Local cluster support (kind)
-Provision deterministic local clusters for safe testing.
-
-## Directory Structure
-
-```
-k8s-production-blueprint/
-├─ k8s/
-│  ├─ base/
-│  ├─ overlays/
-│  │  ├─ dev/
-│  │  └─ prod/
-│  └─ apps/
-│     └─ myapp/
-├─ .github/workflows/
-├─ tools/
-├─ docs/
-└─ README.md
-```
-
-## Quick Start
-
-### Create a local Kubernetes cluster
+## 1. Create EKS cluster
 ```bash
-./tools/create-kind-cluster.sh
+cd eks/terraform
+terraform init
+terraform apply
 ```
 
-### Apply dev environment manifests
+Export kubeconfig:
+```bash
+aws eks update-kubeconfig --region ap-south-1 --name k8s-production-cluster
+```
+
+## 2. Bootstrap Flux (GitOps)
+```bash
+flux bootstrap github   --owner=shizznet   --repository=k8s-production-blueprint   --branch=main   --path=gitops/flux/flux-system
+```
+
+## 3. Encrypt Secrets
+```bash
+./tools/encrypt-secret.sh k8s/secrets/appsecret.template.yaml k8s/secrets/appsecret.enc.yaml
+```
+
+## 4. Deploy workloads
+### Production:
+```bash
+kustomize build k8s/overlays/prod | kubectl apply -f -
+```
+### Development:
 ```bash
 kustomize build k8s/overlays/dev | kubectl apply -f -
 ```
 
-### Verify
-```bash
-kubectl get all -n myapp-dev
-```
-
-## Roadmap
-
-- Add RBAC refinements
-- Add NetworkPolicies
-- Add probes across deployments
-- Add PodDisruptionBudgets
-- Add Ingress + TLS (cert-manager)
-- Add GitOps bootstrap configuration
-- Add monitoring and logging components
-- Add security scanning workflows
-
-## License
-MIT License. See `LICENSE` for details.
+---
