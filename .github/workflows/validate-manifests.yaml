@@ -1,0 +1,41 @@
+name: Validate Kubernetes Manifests
+
+on:
+  pull_request:
+  push:
+    branches: [ main, prod, dev ]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'latest'
+
+      - name: Install Kustomize
+        run: |
+          set -e
+          curl -sLo kustomize.tar.gz https://github.com/kubernetes-sigs/kustomize/releases/latest/download/kustomize_v5.0.1_linux_amd64.tar.gz
+          tar -xzf kustomize.tar.gz
+          chmod +x kustomize
+          sudo mv kustomize /usr/local/bin/
+
+      - name: Build manifests (dev overlay)
+        run: |
+          kustomize build k8s/overlays/dev > /tmp/manifests.yaml
+
+      - name: Validate manifest syntax
+        run: |
+          kubectl apply --dry-run=client -f /tmp/manifests.yaml
+
+      - name: Lint YAML structure
+        uses: ibiqlik/action-yamllint@v3
+        with:
+          file_or_dir: k8s
+
