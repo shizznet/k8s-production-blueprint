@@ -26,13 +26,16 @@ jobs:
       - name: Build manifests (dev overlay)
         run: kustomize build k8s/overlays/dev > /tmp/manifests.yaml
 
-      - name: Remove kubeconfig (prevent API calls)
+      - name: Install kubeconform
         run: |
-          unset KUBECONFIG
-          rm -f ~/.kube/config || true
+          curl -L https://github.com/yannh/kubeconform/releases/latest/download/kubeconform-linux-amd64.tar.gz \
+            | tar xz
+          sudo mv kubeconform /usr/local/bin/
 
-      - name: Validate manifests (client-side only)
-        run: kubectl create --dry-run=client --validate=false -f /tmp/manifests.yaml
+      - name: Validate manifests (kubeconform)
+        run: |
+          kubeconform -strict -skip CustomResourceDefinition -summary /tmp/manifests.yaml
+
 
       - name: YAML Lint
         uses: ibiqlik/action-yamllint@v3
