@@ -5,12 +5,21 @@ namespace: myapp-prod
 
 resources:
   - namespace.yaml
+  - ../../apps/myapp
   - ../../base
-  - ../../optional/ingress           # only if enabled
+  # OPTIONAL MODULES:
+  # - ../../optional/ingress
   # - ../../optional/loadbalancer
   # - ../../optional/networkpolicy
   # - ../../optional/monitoring
 
-patchesStrategicMerge:
-  - patch-deployment.yaml
-  - patch-hpa.yaml
+patches:
+  - path: patch-deployment.yaml
+    target:
+      kind: Deployment
+      name: myapp
+
+  - path: patch-hpa.yaml
+    target:
+      kind: HorizontalPodAutoscaler
+      name: myapp

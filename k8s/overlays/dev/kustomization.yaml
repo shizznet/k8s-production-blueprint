@@ -5,11 +5,16 @@ namespace: myapp-dev
 
 resources:
   - namespace.yaml
+  - ../../apps/myapp
   - ../../base
-  - ../../optional/ingress          # only if you enabled it
-  # - ../../optional/loadbalancer   # optional
-  # - ../../optional/networkpolicy  # optional
-  # - ../../optional/monitoring     # optional
+  # OPTIONAL MODULES:
+  # - ../../optional/ingress
+  # - ../../optional/loadbalancer
+  # - ../../optional/networkpolicy
+  # - ../../optional/monitoring
 
-patchesStrategicMerge:
-  - patch-deployment.yaml
+patches:
+  - path: patch-deployment.yaml
+    target:
+      kind: Deployment
+      name: myapp
