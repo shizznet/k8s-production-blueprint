@@ -1,21 +1,30 @@
 # Contributing Guide
 
-## Branch Strategy
-- `main` → stable
+## Branch Model
+- `main` → stable, production-ready
 - `dev` → integration/testing
 
-### Branch protection
-- Require PR reviews
-- Require CI workflow to pass
-- Prevent force pushes
-- No plaintext secrets
+### Recommended Branch Protections
+- Require PR reviews  
+- Require CI validation  
+- Prevent force pushes  
+- Disallow deletion of `main`  
+- No plaintext secrets committed  
 
-## Commit Rules
-Must pass:
+---
+
+## Commit Requirements
+
+Before pushing:
 ```bash
 kustomize build k8s/overlays/dev | kubectl apply --dry-run=client -f -
 ```
 
-## GitOps Rules
-- All production changes go through PRs
-- FluxCD applies them automatically
+YAML must pass linting and all secrets must be `.enc.yaml` files.
+
+---
+
+## GitOps Workflow Rules
+- All production changes go through PRs  
+- FluxCD applies changes automatically  
+- Never manually `kubectl apply` to production  

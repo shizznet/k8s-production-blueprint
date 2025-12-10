@@ -27,5 +27,5 @@ networking:
 EOF
 
 echo "Cluster '${CLUSTER_NAME}' created."
-echo "Install ingress:"
+echo "Install ingress controller:"
 echo "kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml"

@@ -10,9 +10,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - uses: azure/setup-kubectl@v3
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v3
         with:
           version: 'latest'
 
@@ -23,12 +25,13 @@ jobs:
           chmod +x kustomize
           sudo mv kustomize /usr/local/bin/
 
-      - name: Build manifests (dev)
+      - name: Build manifests (dev overlay)
         run: kustomize build k8s/overlays/dev > /tmp/manifests.yaml
 
-      - name: Validate syntax
+      - name: Validate manifest syntax
         run: kubectl apply --dry-run=client -f /tmp/manifests.yaml
 
-      - uses: ibiqlik/action-yamllint@v3
+      - name: YAML Lint
+        uses: ibiqlik/action-yamllint@v3
         with:
           file_or_dir: k8s
