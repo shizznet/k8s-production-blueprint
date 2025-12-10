@@ -26,6 +26,11 @@ jobs:
       - name: Build manifests (dev overlay)
         run: kustomize build k8s/overlays/dev > /tmp/manifests.yaml
 
+      - name: Remove kubeconfig (prevent API calls)
+        run: |
+          unset KUBECONFIG
+          rm -f ~/.kube/config || true
+
       - name: Validate manifests (client-side only)
         run: kubectl create --dry-run=client --validate=false -f /tmp/manifests.yaml
 
